@@ -17,7 +17,7 @@ public abstract class SnakeAI {
         ArrayList<Node> path = calculatePath(board, snake, target);
 
         //if the path is not empty, get the next move. If the path is empty, there is no path to the target. The snake will then keep walk forward into its doom.
-        if(!path.isEmpty()){
+        if(!path.isEmpty() && path.size() != 1){
             BoardPosition currentPosition = snake.getHead().getPosition();
 
             BoardPosition left = new BoardPosition(currentPosition.getPosX(), currentPosition.getPosY() - 1);

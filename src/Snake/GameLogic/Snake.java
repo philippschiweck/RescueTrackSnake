@@ -16,6 +16,7 @@ public class Snake {
         this.head.setDirection(Direction.LEFT);
         this.tail = this.head;
 
+        //TODO Manually add first 3 Snake segments, so they don't appear out of thin air
         extendBody();
         extendBody();
         extendBody();

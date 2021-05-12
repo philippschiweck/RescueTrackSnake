@@ -11,7 +11,7 @@ import java.util.function.BooleanSupplier;
 public class SnakeGame{
 
     private final int SIZE_X = 15;
-    private final int SIZE_Y = 30;
+    private final int SIZE_Y = 60;
 
     public final char FOOD_SYMBOL = 'a';
 
@@ -24,6 +24,7 @@ public class SnakeGame{
     private Board board;
     private Direction direction;
     private boolean gameRunning;
+    private int score;
 
     public static void main(String[] args){
         new SnakeGame();
@@ -31,19 +32,19 @@ public class SnakeGame{
 
     public SnakeGame(){
         initGame();
-        this.startGame();
+        startGame();
     }
 
     private void initGame(){
-        this.board = new Board(SIZE_X, SIZE_Y);
-        this.food = new ArrayList<>();
+        board = new Board(SIZE_X, SIZE_Y);
+        food = new ArrayList<>();
         //Snake starts in the middle of the board
-        this.snake = new Snake(new BoardPosition(SIZE_X / 2, SIZE_Y / 2));
+        snake = new Snake(new BoardPosition(SIZE_X / 2, SIZE_Y / 2));
+        score = 0;
 
         //Add first food item
         food.add(new Food(new BoardPosition(SIZE_X / 2, SIZE_Y / 2 - 4), '1'));
 
-        //addFood();
     }
 
     private void startGame(){
@@ -65,6 +66,7 @@ public class SnakeGame{
                 if(checkCollision(item.getPosition(), snake.getHead().getPosition())){
                     food.remove(item);
                     snake.extendBody();
+                    score++;
                     addFood();
                 }
             }
@@ -77,6 +79,8 @@ public class SnakeGame{
             }
 
         }
+
+        System.out.println(String.format("Game over! Score: %d", score));
 
     }
 
@@ -131,11 +135,12 @@ public class SnakeGame{
         //TODO Should check that food does not spawn in snake
         BoardPosition newFoodPosition = generateRandomPos();
 
+        //Get list of all body positions + head to compare to new Food item Position
         ArrayList<BoardPosition> snakeBodyPosition = new ArrayList<>();
-
         for(SnakeSegment segment: snake.getBody()){
             snakeBodyPosition.add(segment.getPosition());
         }
+        snakeBodyPosition.add(snake.getHead().getPosition());
 
         while(snakeBodyPosition.contains(newFoodPosition)){
             newFoodPosition = generateRandomPos();
