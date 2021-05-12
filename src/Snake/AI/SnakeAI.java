@@ -22,7 +22,7 @@ public abstract class SnakeAI {
         BoardPosition up = new BoardPosition(currentPosition.getPosX() + 1, currentPosition.getPosY());
         BoardPosition down = new BoardPosition(currentPosition.getPosX() - 1, currentPosition.getPosY());
 
-        //Get next movement Node
+        //Get next movement Node //TODO What if Path is null?
         Node next = path.get(path.size() - 2);
         BoardPosition nextPosition = next.getPosition();
 
@@ -55,7 +55,10 @@ public abstract class SnakeAI {
         //Breadth-first search
         while(!seen.isEmpty()){
              current = getShortestDistanceNode(seen);
+             seen.remove(current);
             if(current.getPosition().equals(target)){
+                //TODO If Path does not find target node, but seen is empty
+                // then return longest distance Node
                 break;
             }
             for(Node node: getPossibleSurroundingNodes(current, target, snake.getBody())){
@@ -67,6 +70,7 @@ public abstract class SnakeAI {
 
         //Retrace Path
         while(current != null){
+            //TODO If Path does not find target node
             path.add(current);
             current = current.getParent();
         }

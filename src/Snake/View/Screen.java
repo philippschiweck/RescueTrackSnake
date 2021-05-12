@@ -2,11 +2,13 @@ package Snake.View;
 
 import Snake.GameLogic.*;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 
 public final class Screen {
 
     public static void drawScreen(Board board, ArrayList<Food> food, Snake snake){
+        //Clear previous output
         clearConsole();
 
         char[][] screen = buildScreen(board, food, snake);
@@ -27,6 +29,7 @@ public final class Screen {
         for(int i = 0; i < screen[0].length; i++){
             System.out.print('_');
         }
+        System.out.println();
     }
 
     private static char[][] buildScreen(Board board, ArrayList<Food> food, Snake snake){
@@ -58,10 +61,9 @@ public final class Screen {
             int posX = segment.getPosition().getPosX();
             int posY = segment.getPosition().getPosY();
             screen[posX][posY] = segment.getSymbol();
+            //TODO If last Segment is at the boundary, and a new Segment is added, this Segment is out of Bounds when the Snake turns away from the
+            // boundary - this causes ArrayIndexOutOfBoundsException
         }
-
-
-        //...
 
         return screen;
     }

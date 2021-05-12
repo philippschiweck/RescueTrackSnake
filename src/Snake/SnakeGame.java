@@ -10,7 +10,7 @@ import java.util.Random;
 public class SnakeGame{
 
     private final int SIZE_X = 15;
-    private final int SIZE_Y = 60;
+    private final int SIZE_Y = 30;
 
     public final char FOOD_SYMBOL = 'a';
 
