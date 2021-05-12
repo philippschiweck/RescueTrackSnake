@@ -44,31 +44,35 @@ public abstract class SnakeAI {
      * @return List of Nodes from target to origin.
      */
     private static ArrayList<Node> calculatePath(Board board, Snake snake, BoardPosition target){
+        //Current Elements in the queue
+        ArrayList<Node> queue = new ArrayList<>();
+        //Elements that have been seen
         ArrayList<Node> seen = new ArrayList<>();
-        ArrayList<Node> path = new ArrayList<>();
 
         SnakeSegment start = snake.getHead();
 
         //Label root as discovered
         Node current = new Node(start.getPosition(), calculateDistance(start.getPosition(), target), null);
-        seen.add(current);
+        queue.add(current);
         //Breadth-first search
-        while(!seen.isEmpty()){
-             current = getShortestDistanceNode(seen);
-             seen.remove(current);
+        while(!queue.isEmpty()){
+             current = getShortestDistanceNode(queue);
+             queue.remove(current);
             if(current.getPosition().equals(target)){
-                //TODO If Path does not find target node, but seen is empty
+                //TODO If Path does not find target node, but queue is empty
                 // then return longest distance Node
                 break;
             }
             for(Node node: getPossibleSurroundingNodes(current, target, snake.getBody())){
                 if(!isBoardPositionInList(node, seen)){
                     seen.add(node);
+                    queue.add(node);
                 }
             }
         }
 
         //Retrace Path
+        ArrayList<Node> path = new ArrayList<>();
         while(current != null){
             //TODO If Path does not find target node
             path.add(current);
