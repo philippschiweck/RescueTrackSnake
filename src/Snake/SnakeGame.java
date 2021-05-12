@@ -11,7 +11,7 @@ import java.util.function.BooleanSupplier;
 public class SnakeGame{
 
     private final int SIZE_X = 15;
-    private final int SIZE_Y = 60;
+    private final int SIZE_Y = 30;
 
     public final char FOOD_SYMBOL = 'a';
 
@@ -60,7 +60,7 @@ public class SnakeGame{
             //TODO Snake AI input
             direction = SnakeAI.getNextMove(board, snake, food.get(0).getPosition());
             snake.getHead().setDirection(direction);
-            moveSnake();
+            snake.moveSnake(direction);
 
             for(Food item: food){
                 if(checkCollision(item.getPosition(), snake.getHead().getPosition())){
@@ -84,23 +84,6 @@ public class SnakeGame{
 
     }
 
-    private void moveSnake(){
-        switch (direction){
-            case UP:
-                snake.moveUp();
-                break;
-            case DOWN:
-                snake.moveDown();
-                break;
-            case LEFT:
-                snake.moveLeft();
-                break;
-            case RIGHT:
-                snake.moveRight();
-                break;
-        }
-
-    }
 
     private boolean gameOver(){
         boolean gameOver = false;
