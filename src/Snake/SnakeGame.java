@@ -6,6 +6,7 @@ import Snake.View.Screen;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.function.BooleanSupplier;
 
 public class SnakeGame{
 
@@ -128,7 +129,19 @@ public class SnakeGame{
 
     private void addFood(){
         //TODO Should check that food does not spawn in snake
-        this.food.add(new Food(generateRandomPos(), FOOD_SYMBOL));
+        BoardPosition newFoodPosition = generateRandomPos();
+
+        ArrayList<BoardPosition> snakeBodyPosition = new ArrayList<>();
+
+        for(SnakeSegment segment: snake.getBody()){
+            snakeBodyPosition.add(segment.getPosition());
+        }
+
+        while(snakeBodyPosition.contains(newFoodPosition)){
+            newFoodPosition = generateRandomPos();
+        }
+
+        this.food.add(new Food(newFoodPosition, FOOD_SYMBOL));
     }
 
 }
