@@ -25,22 +25,8 @@ public class Snake {
         BoardPosition newSegmentPosition;
 
         //TODO add last Segment behind Tail
-        switch(tail.getDirection()){
-            case DOWN: //if snake moves down, add new Segment at up
-                newSegmentPosition = new BoardPosition(tail.getPosition().getPosX() + 1, tail.getPosition().getPosY());
-                break;
-            case UP://if snake moves up, add new Segment at down
-                newSegmentPosition = new BoardPosition(tail.getPosition().getPosX() - 1, tail.getPosition().getPosY());
-                break;
-            case RIGHT:
-                newSegmentPosition = new BoardPosition(tail.getPosition().getPosX(), tail.getPosition().getPosY() - 1);
-                break;
-            case LEFT:
-                newSegmentPosition = new BoardPosition(tail.getPosition().getPosX() , tail.getPosition().getPosY() + 1);
-                break;
-            default:
-                newSegmentPosition = tail.getPosition();
-        }
+        newSegmentPosition = new BoardPosition(tail.getPosition().getPosX(), tail.getPosition().getPosY());
+
         SnakeSegment newSegment = new SnakeSegment(this, newSegmentPosition, BODY_SYMBOL);
         newSegment.setDirection(tail.getDirection());
 
