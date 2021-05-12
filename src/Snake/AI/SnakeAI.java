@@ -13,28 +13,34 @@ public abstract class SnakeAI {
 
         Direction nextMove = snake.getHead().getDirection();
 
+        //get the optimal path to the target
         ArrayList<Node> path = calculatePath(board, snake, target);
 
-        BoardPosition currentPosition = snake.getHead().getPosition();
+        //if the path is not empty, get the next move. If the path is empty, there is no path to the target. The snake will then keep walk forward into its doom.
+        if(!path.isEmpty()){
+            BoardPosition currentPosition = snake.getHead().getPosition();
 
-        BoardPosition left = new BoardPosition(currentPosition.getPosX(), currentPosition.getPosY() - 1);
-        BoardPosition right = new BoardPosition(currentPosition.getPosX(), currentPosition.getPosY() + 1);
-        BoardPosition up = new BoardPosition(currentPosition.getPosX() + 1, currentPosition.getPosY());
-        BoardPosition down = new BoardPosition(currentPosition.getPosX() - 1, currentPosition.getPosY());
+            BoardPosition left = new BoardPosition(currentPosition.getPosX(), currentPosition.getPosY() - 1);
+            BoardPosition right = new BoardPosition(currentPosition.getPosX(), currentPosition.getPosY() + 1);
+            BoardPosition up = new BoardPosition(currentPosition.getPosX() + 1, currentPosition.getPosY());
+            BoardPosition down = new BoardPosition(currentPosition.getPosX() - 1, currentPosition.getPosY());
 
-        //Get next movement Node //TODO What if Path is null?
-        Node next = path.get(path.size() - 2);
-        BoardPosition nextPosition = next.getPosition();
+            //Get next movement Node //TODO What if Path is null?
+            Node next = path.get(path.size() - 2);
+            BoardPosition nextPosition = next.getPosition();
 
-        if(left.equals(nextPosition)){
-            nextMove = Direction.LEFT;
-        } else if (right.equals(nextPosition)){
-            nextMove = Direction.RIGHT;
-        } else if (up.equals(nextPosition)) {
-            nextMove = Direction.UP;
-        } else if (down.equals(nextPosition)){
-            nextMove = Direction.DOWN;
+            if(left.equals(nextPosition)){
+                nextMove = Direction.LEFT;
+            } else if (right.equals(nextPosition)){
+                nextMove = Direction.RIGHT;
+            } else if (up.equals(nextPosition)) {
+                nextMove = Direction.UP;
+            } else if (down.equals(nextPosition)){
+                nextMove = Direction.DOWN;
+            }
         }
+
+
 
         return nextMove;
     }
@@ -63,7 +69,7 @@ public abstract class SnakeAI {
                 // then return longest distance Node
                 break;
             }
-            for(Node node: getPossibleSurroundingNodes(current, target, snake.getBody())){
+            for(Node node: getPossibleSurroundingNodes(board, current, target, snake.getBody())){
                 if(!isBoardPositionInList(node, seen)){
                     seen.add(node);
                     queue.add(node);
@@ -102,8 +108,10 @@ public abstract class SnakeAI {
         return leastDistance;
     }
 
-    private static ArrayList<Node> getPossibleSurroundingNodes(Node current, BoardPosition target, ArrayList<SnakeSegment> body){
-        ArrayList<Node> fields = new ArrayList<>();
+    private static ArrayList<Node> getPossibleSurroundingNodes(Board board, Node current, BoardPosition target, ArrayList<SnakeSegment> body){
+
+        //TODO remove fields that are out of bounds
+        ArrayList<Node> possibleNodes = new ArrayList<>();
 
         BoardPosition currentPosition = current.getPosition();
 
@@ -114,31 +122,51 @@ public abstract class SnakeAI {
         BoardPosition down = new BoardPosition(currentPosition.getPosX() - 1, currentPosition.getPosY());
 
         ArrayList<BoardPosition> newPositions = new ArrayList<>();
-        newPositions.add(left);
-        newPositions.add(right);
-        newPositions.add(up);
-        newPositions.add(down);
-
-        for(SnakeSegment segment: body){
-            if(segment.getPosition().equals(left)){
-                newPositions.remove(left);
-            }
-            if(segment.getPosition().equals(right)){
-                newPositions.remove(right);
-            }
-            if(segment.getPosition().equals(up)){
-                newPositions.remove(up);
-            }
-            if(segment.getPosition().equals(down)){
-                newPositions.remove(down);
-            }
+        //Add left if it is inbounds
+        if(isInBounds(board, left)){
+            newPositions.add(left);
         }
+        //Add right if it is inbounds
+        if(isInBounds(board, right)){
+            newPositions.add(right);
+        }
+        //Add up if it is inbounds
+        if(isInBounds(board, up)){
+            newPositions.add(up);
+        }
+        //Add right down it is inbounds
+        if(isInBounds(board, down)){
+            newPositions.add(down);
+        }
+
+
+        //Remove possible nodes that are inside the body of the snake
+        for(SnakeSegment segment: body) {
+            if(!newPositions.isEmpty()){
+                for(BoardPosition position: newPositions){
+                    if (segment.getPosition().equals(position)) {
+                        newPositions.remove(position);
+                        break;
+                    }
+                }
+            } else {
+                break;
+            }
+
+        }
+
+        //Remove possible nodes that are out of bounds
 
         for(BoardPosition position: newPositions){
-            fields.add(new Node(position, calculateDistance(position, target), current));
+            possibleNodes.add(new Node(position, calculateDistance(position, target), current));
         }
 
-        return fields;
+        return possibleNodes;
+    }
+
+    private static boolean isInBounds(Board board, BoardPosition position){
+        return position.getPosY() >= 0 && position.getPosY() < board.getBoard()[0].length &&
+                position.getPosX() >= 0 && position.getPosX() < board.getBoard().length;
     }
 
     /**
