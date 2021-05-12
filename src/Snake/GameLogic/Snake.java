@@ -8,11 +8,11 @@ public class Snake {
 
     private ArrayList<SnakeSegment> body;
     private SnakeSegment head;
-    SnakeSegment tail;
+    private SnakeSegment tail;
 
     public Snake(BoardPosition boardPosition){
         this.body = new ArrayList<>();
-        this.head = new SnakeSegment(this, boardPosition, HEAD_SYMBOL);
+        this.head = new SnakeSegment(this, boardPosition, null, HEAD_SYMBOL);
         this.head.setDirection(Direction.LEFT);
         this.tail = this.head;
 
@@ -24,10 +24,9 @@ public class Snake {
     public void extendBody(){
         BoardPosition newSegmentPosition;
 
-        //TODO add last Segment behind Tail
         newSegmentPosition = new BoardPosition(tail.getPosition().getPosX(), tail.getPosition().getPosY());
 
-        SnakeSegment newSegment = new SnakeSegment(this, newSegmentPosition, BODY_SYMBOL);
+        SnakeSegment newSegment = new SnakeSegment(this, newSegmentPosition, this.tail, BODY_SYMBOL);
         newSegment.setDirection(tail.getDirection());
 
         this.body.add(newSegment);
@@ -51,7 +50,6 @@ public class Snake {
         BoardPosition nextHeadPosition = new BoardPosition(head.getPosition().getPosX() + 1, head.getPosition().getPosY());
         moveBody();
         head.setPosition(nextHeadPosition);
-        head.setDirection(Direction.UP);
     }
     public void moveDown(){
         BoardPosition nextHeadPosition = new BoardPosition(head.getPosition().getPosX() - 1, head.getPosition().getPosY());
@@ -62,16 +60,7 @@ public class Snake {
 
     private void moveBody(){
         if(body.size() > 0){
-            for(int i = body.size() - 1; i > 0; i--){
-                SnakeSegment currentSegment = body.get(i);
-                SnakeSegment nextSegment = body.get(i - 1);
-                currentSegment.setDirection(nextSegment.getDirection());
-                currentSegment.setPosition(nextSegment.getPosition());
-            }
-
-            SnakeSegment segment = body.get(0);
-            segment.setDirection(head.getDirection());
-            segment.setPosition(head.getPosition());
+            tail.moveSegment();
         }
     }
 

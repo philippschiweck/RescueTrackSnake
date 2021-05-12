@@ -27,6 +27,7 @@ public abstract class SnakeAI {
 
             //Get next movement Node //TODO What if Path is null?
             Node next = path.get(path.size() - 2);
+
             BoardPosition nextPosition = next.getPosition();
 
             if(left.equals(nextPosition)){
@@ -106,6 +107,17 @@ public abstract class SnakeAI {
             }
         }
         return leastDistance;
+    }
+
+    private static Node getLongestDistanceNode(ArrayList<Node> list){
+        Node longestDistance = list.get(0);
+
+        for(Node elem: list){
+            if(elem.getDistance() > longestDistance.getDistance()){
+                longestDistance = elem;
+            }
+        }
+        return longestDistance;
     }
 
     private static ArrayList<Node> getPossibleSurroundingNodes(Board board, Node current, BoardPosition target, ArrayList<SnakeSegment> body){
