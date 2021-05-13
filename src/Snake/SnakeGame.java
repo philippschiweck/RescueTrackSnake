@@ -10,12 +10,12 @@ import java.util.function.BooleanSupplier;
 
 public class SnakeGame{
 
-    private final int SIZE_X = 15;
-    private final int SIZE_Y = 30;
+    private final int SIZE_X = 7;
+    private final int SIZE_Y = 15;
 
     public final char FOOD_SYMBOL = 'a';
 
-    public final int WAIT_TIME = 100;
+    public final int WAIT_TIME = 150;
 
     public final Direction STARTING_DIRECTION = Direction.LEFT;
 
@@ -57,8 +57,8 @@ public class SnakeGame{
 
         while(gameRunning){
             Screen.drawScreen(board, food, snake);
-            //TODO Snake AI input
             direction = SnakeAI.getNextMove(board, snake, food.get(0).getPosition());
+            //TODO validate movement as legitimate
             snake.getHead().setDirection(direction);
             snake.moveSnake(direction);
 
@@ -90,11 +90,17 @@ public class SnakeGame{
         SnakeSegment head = snake.getHead();
 
         //TODO Check Boundary collision
-
-        for(SnakeSegment segment: snake.getBody()){
-            if(checkCollision(segment.getPosition(), head.getPosition())){
-                gameOver = true;
-                break;
+        if(head.getPosition().getPosX() < 0 ||
+            head.getPosition().getPosX() >= SIZE_X ||
+            head.getPosition().getPosY() < 0 ||
+            head.getPosition().getPosY() >= SIZE_Y){
+            gameOver = true;
+        } else {
+            for(SnakeSegment segment: snake.getBody()){
+                if(checkCollision(segment.getPosition(), head.getPosition())){
+                    gameOver = true;
+                    break;
+                }
             }
         }
 
