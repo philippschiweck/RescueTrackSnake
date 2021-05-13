@@ -89,7 +89,6 @@ public class SnakeGame{
         boolean gameOver = false;
         SnakeSegment head = snake.getHead();
 
-        //TODO Check Boundary collision
         if(head.getPosition().getPosX() < 0 ||
             head.getPosition().getPosX() >= SIZE_X ||
             head.getPosition().getPosY() < 0 ||
@@ -121,7 +120,6 @@ public class SnakeGame{
     }
 
     private void addFood(){
-        //TODO Should check that food does not spawn in snake
         BoardPosition newFoodPosition = generateRandomPos();
 
         //Get list of all body positions + head to compare to new Food item Position
