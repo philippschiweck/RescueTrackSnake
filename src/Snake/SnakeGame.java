@@ -10,12 +10,12 @@ import java.util.function.BooleanSupplier;
 
 public class SnakeGame{
 
-    private final int SIZE_X = 7;
-    private final int SIZE_Y = 15;
+    private final int SIZE_X = 30;
+    private final int SIZE_Y = 60;
 
     public final char FOOD_SYMBOL = 'a';
 
-    public final int WAIT_TIME = 150;
+    public final int WAIT_TIME = 100;
 
     public final Direction STARTING_DIRECTION = Direction.LEFT;
 
@@ -25,6 +25,8 @@ public class SnakeGame{
     private Direction direction;
     private boolean gameRunning;
     private int score;
+
+    private SnakeAI snakeAI;
 
     public static void main(String[] args){
         new SnakeGame();
@@ -41,7 +43,7 @@ public class SnakeGame{
         //Snake starts in the middle of the board
         snake = new Snake(new BoardPosition(SIZE_X / 2, SIZE_Y / 2));
         score = 0;
-
+        snakeAI = new SnakeAI(board);
         //Add first food item
         food.add(new Food(new BoardPosition(SIZE_X / 2, SIZE_Y / 2 - 4), '1'));
 
@@ -57,7 +59,7 @@ public class SnakeGame{
 
         while(gameRunning){
             Screen.drawScreen(board, food, snake);
-            direction = SnakeAI.getNextMove(board, snake, food.get(0).getPosition());
+            direction = snakeAI.getNextMove(board, snake, food.get(0).getPosition());
             //TODO validate movement as legitimate
             snake.getHead().setDirection(direction);
             snake.moveSnake(direction);

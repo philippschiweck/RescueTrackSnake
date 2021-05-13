@@ -5,9 +5,43 @@ import Snake.GameLogic.*;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-public abstract class SnakeAI {
+public class SnakeAI {
 
     //Todo Issue: When snake blocks entire length of board, head is on the other side of the food item
+
+    private WeightedBoardNode[][] weights;
+
+    public SnakeAI(Board board){
+        this.weights = calculateBoardWeights(board);
+    }
+
+    private WeightedBoardNode[][] calculateBoardWeights(Board board){
+
+        WeightedBoardNode[][] newWeights = new WeightedBoardNode[board.getBoard().length][board.getBoard()[0].length];
+
+        int boardCenterX = board.getBoard().length / 2;
+        int boardCenterY = board.getBoard()[0].length / 2;
+
+        for(int i = 0; i < board.getBoard().length; i++){
+            for(int j = 0; j < board.getBoard()[i].length; j++){
+                BoardPosition position = board.getBoard()[i][j];
+                int weight = (int) (Math.min(boardCenterX, boardCenterY) * Math.log(1 + (boardCenterX - Math.abs(boardCenterX - i)) * (boardCenterY - Math.abs(boardCenterY - j))));
+
+                newWeights[i][j] = new WeightedBoardNode(position, weight);
+            }
+        }
+
+        //Print out weights when SnakeAI is created, for reference
+        System.out.println("Snake AI Board weights:");
+        for(int i = 0; i < newWeights.length; i++){
+            for(int j = 0; j < newWeights[i].length; j++){
+                System.out.print(newWeights[i][j].weight + " ");
+            }
+            System.out.println();
+        }
+
+        return newWeights;
+    }
 
     /**
      * Calculates the next direction the snake has to move in order to get to the target.
@@ -17,7 +51,7 @@ public abstract class SnakeAI {
      * @param target Target Boardposition that the Snake
      * @return The next direction the snake should move on the board in order to get to the target.
      */
-    public static Direction getNextMove(Board board, Snake snake, BoardPosition target){
+    public Direction getNextMove(Board board, Snake snake, BoardPosition target){
 
         Direction nextMove = snake.getHead().getDirection();
 
@@ -55,7 +89,10 @@ public abstract class SnakeAI {
      * Breadth first search path calculation.
      * @return List of Nodes from target to origin.
      */
-    private static ArrayList<Node> calculatePath(Board board, Snake snake, BoardPosition target){
+    private ArrayList<Node> calculatePath(Board board, Snake snake, BoardPosition target){
+
+        //Get weighted board positions
+
         //Current Elements in the queue
         ArrayList<Node> queue = new ArrayList<>();
         //Elements that have been seen
@@ -93,7 +130,7 @@ public abstract class SnakeAI {
         return path;
     }
 
-    private static boolean isBoardPositionInList(Node node, ArrayList<Node> list){
+    private boolean isBoardPositionInList(Node node, ArrayList<Node> list){
         boolean isInList = false;
         for(Node element: list){
             if(element.equals(node)){
@@ -103,7 +140,7 @@ public abstract class SnakeAI {
         return isInList;
     }
 
-    private static Node getShortestDistanceNode(ArrayList<Node> list){
+    private Node getShortestDistanceNode(ArrayList<Node> list){
         Node leastDistance = list.get(0);
 
         for(Node elem: list){
@@ -114,7 +151,7 @@ public abstract class SnakeAI {
         return leastDistance;
     }
 
-    private static Node getLongestDistanceNode(ArrayList<Node> list){
+    private Node getLongestDistanceNode(ArrayList<Node> list){
         Node longestDistance = list.get(0);
 
         for(Node elem: list){
@@ -133,9 +170,8 @@ public abstract class SnakeAI {
      * @param body
      * @return
      */
-    private static ArrayList<Node> getPossibleSurroundingNodes(Board board, Node current, BoardPosition target, ArrayList<SnakeSegment> body){
+    private ArrayList<Node> getPossibleSurroundingNodes(Board board, Node current, BoardPosition target, ArrayList<SnakeSegment> body){
 
-        //TODO remove fields that are out of bounds
         ArrayList<Node> possibleNodes = new ArrayList<>();
 
         BoardPosition currentPosition = current.getPosition();
@@ -180,13 +216,14 @@ public abstract class SnakeAI {
         }
 
         for(BoardPosition position: newPositions){
-            possibleNodes.add(new Node(position, calculateDistance(position, target), current));
+            double distanceWithWeight = calculateDistance(position, target) + weights[position.getPosX()][position.getPosY()].weight;
+            possibleNodes.add(new Node(position, distanceWithWeight, current));
         }
 
         return possibleNodes;
     }
 
-    private static boolean isInBounds(Board board, BoardPosition position){
+    private boolean isInBounds(Board board, BoardPosition position){
         return position.getPosY() >= 0 && position.getPosY() < board.getBoard()[0].length &&
                 position.getPosX() >= 0 && position.getPosX() < board.getBoard().length;
     }
@@ -198,17 +235,17 @@ public abstract class SnakeAI {
      * @param target
      * @return
      */
-    private static int calculateDistance(BoardPosition current, BoardPosition target){
+    private int calculateDistance(BoardPosition current, BoardPosition target){
         return Math.abs(current.getPosX() - target.getPosX()) + Math.abs(current.getPosY() - target.getPosY());
     }
 
-    private static class Node{
+    private class Node{
         private BoardPosition position;
-        private int distance;
+        private double distance;
         private Node parent;
         private int distanceToRoot;
 
-        public Node(BoardPosition position, int distance, Node parent){
+        public Node(BoardPosition position, double distance, Node parent){
             this.position = position;
             this.distance = distance;
             this.parent = parent;
@@ -224,7 +261,7 @@ public abstract class SnakeAI {
             return position;
         }
 
-        public int getDistance() {
+        public double getDistance() {
             return distance;
         }
 
@@ -255,4 +292,17 @@ public abstract class SnakeAI {
             return equals;
         }
     }
+
+    private class WeightedBoardNode{
+
+        private BoardPosition position;
+        private double weight;
+
+        public WeightedBoardNode(BoardPosition position, double weight){
+            this.position = position;
+            this.weight = weight;
+
+        }
+    }
+
 }
