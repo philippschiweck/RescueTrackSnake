@@ -10,10 +10,10 @@ import java.util.function.BooleanSupplier;
 
 public class SnakeGame{
 
-    private final int SIZE_X = 30;
-    private final int SIZE_Y = 60;
+    private final int SIZE_X = 15;
+    private final int SIZE_Y = 31;
 
-    public final char FOOD_SYMBOL = 'a';
+    public final char FOOD_SYMBOL = 'X';
 
     public final int WAIT_TIME = 100;
 

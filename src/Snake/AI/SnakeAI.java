@@ -15,17 +15,26 @@ public class SnakeAI {
         this.weights = calculateBoardWeights(board);
     }
 
+    /**
+     *
+     * @param board
+     * @return
+     */
     private WeightedBoardNode[][] calculateBoardWeights(Board board){
 
         WeightedBoardNode[][] newWeights = new WeightedBoardNode[board.getBoard().length][board.getBoard()[0].length];
 
-        int boardCenterX = board.getBoard().length / 2;
-        int boardCenterY = board.getBoard()[0].length / 2;
+        int halfLengthX = (board.getBoard().length) / 2;
+        int halfLengthY = (board.getBoard()[0].length) / 2;
+
+        System.out.println(halfLengthX);
 
         for(int i = 0; i < board.getBoard().length; i++){
             for(int j = 0; j < board.getBoard()[i].length; j++){
                 BoardPosition position = board.getBoard()[i][j];
-                int weight = (int) (Math.min(boardCenterX, boardCenterY) * Math.log(1 + (boardCenterX - Math.abs(boardCenterX - i)) * (boardCenterY - Math.abs(boardCenterY - j))));
+                int xDiff = halfLengthX - Math.abs(i  - halfLengthX) ;
+                int yDiff = halfLengthY - Math.abs(j  - halfLengthY) ;
+                int weight = (int)(board.getBoard().length * Math.log(1 + Math.min(xDiff, yDiff)));
 
                 newWeights[i][j] = new WeightedBoardNode(position, weight);
             }
@@ -296,9 +305,9 @@ public class SnakeAI {
     private class WeightedBoardNode{
 
         private BoardPosition position;
-        private double weight;
+        private int weight;
 
-        public WeightedBoardNode(BoardPosition position, double weight){
+        public WeightedBoardNode(BoardPosition position, int weight){
             this.position = position;
             this.weight = weight;
 
