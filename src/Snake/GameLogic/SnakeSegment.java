@@ -6,9 +6,6 @@ public class SnakeSegment extends Segment {
     private Direction direction;
     private SnakeSegment parent;
 
-    //TODO Give Snake segment parent segment
-    // + move function, which moves it to its parents position
-
     public SnakeSegment(Snake snake, BoardPosition boardPosition, SnakeSegment parent, char snakeSymbol){
         super(boardPosition, snakeSymbol);
         this.snake = snake;

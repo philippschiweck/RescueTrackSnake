@@ -61,8 +61,6 @@ public final class Screen {
             int posX = segment.getPosition().getPosX();
             int posY = segment.getPosition().getPosY();
             screen[posX][posY] = segment.getSymbol();
-            //TODO If last Segment is at the boundary, and a new Segment is added, this Segment is out of Bounds when the Snake turns away from the
-            // boundary - this causes ArrayIndexOutOfBoundsException
         }
 
         return screen;

@@ -9,6 +9,14 @@ public abstract class SnakeAI {
 
     //Todo Issue: When snake blocks entire length of board, head is on the other side of the food item
 
+    /**
+     * Calculates the next direction the snake has to move in order to get to the target.
+     *
+     * @param board Board that is being played on
+     * @param snake The Snake that has to navigate on the board to the target.
+     * @param target Target Boardposition that the Snake
+     * @return The next direction the snake should move on the board in order to get to the target.
+     */
     public static Direction getNextMove(Board board, Snake snake, BoardPosition target){
 
         Direction nextMove = snake.getHead().getDirection();
@@ -40,9 +48,6 @@ public abstract class SnakeAI {
                 nextMove = Direction.DOWN;
             }
         }
-
-
-
         return nextMove;
     }
 
@@ -120,6 +125,14 @@ public abstract class SnakeAI {
         return longestDistance;
     }
 
+    /**
+     *
+     * @param board
+     * @param current
+     * @param target
+     * @param body
+     * @return
+     */
     private static ArrayList<Node> getPossibleSurroundingNodes(Board board, Node current, BoardPosition target, ArrayList<SnakeSegment> body){
 
         //TODO remove fields that are out of bounds
@@ -133,6 +146,7 @@ public abstract class SnakeAI {
         BoardPosition up = new BoardPosition(currentPosition.getPosX() + 1, currentPosition.getPosY());
         BoardPosition down = new BoardPosition(currentPosition.getPosX() - 1, currentPosition.getPosY());
 
+        //Remove nodes that are out of bounds
         ArrayList<BoardPosition> newPositions = new ArrayList<>();
         //Add left if it is inbounds
         if(isInBounds(board, left)){
@@ -151,12 +165,11 @@ public abstract class SnakeAI {
             newPositions.add(down);
         }
 
-
-        //Remove possible nodes that are inside the body of the snake
-        for(SnakeSegment segment: body) {
+        //Remove possible nodes that are inside the body of the snake, but only if the snake body is still there at the time of the head reaching this position.
+        for(int i = 0; i < body.size() - current.distanceToRoot; i++){
             if(!newPositions.isEmpty()){
                 for(BoardPosition position: newPositions){
-                    if (segment.getPosition().equals(position)) {
+                    if (body.get(i).getPosition().equals(position)) {
                         newPositions.remove(position);
                         break;
                     }
@@ -164,10 +177,7 @@ public abstract class SnakeAI {
             } else {
                 break;
             }
-
         }
-
-        //Remove possible nodes that are out of bounds
 
         for(BoardPosition position: newPositions){
             possibleNodes.add(new Node(position, calculateDistance(position, target), current));
@@ -196,11 +206,18 @@ public abstract class SnakeAI {
         private BoardPosition position;
         private int distance;
         private Node parent;
+        private int distanceToRoot;
 
         public Node(BoardPosition position, int distance, Node parent){
             this.position = position;
             this.distance = distance;
             this.parent = parent;
+            if(parent != null){
+                this.distanceToRoot += this.parent.getDistanceToRoot();
+            } else { //This is the root if parent == null
+                this.distanceToRoot = 0;
+            }
+
         }
 
         public BoardPosition getPosition() {
@@ -213,6 +230,10 @@ public abstract class SnakeAI {
 
         public Node getParent() {
             return parent;
+        }
+
+        public int getDistanceToRoot() {
+            return distanceToRoot;
         }
 
         @Override
