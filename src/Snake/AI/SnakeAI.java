@@ -24,19 +24,25 @@ public class SnakeAI {
 
         WeightedBoardNode[][] newWeights = new WeightedBoardNode[board.getBoard().length][board.getBoard()[0].length];
 
+        //half lengths of the board are needed to calculate increase of weights towards the center
         int halfLengthX = (board.getBoard().length) / 2;
         int halfLengthY = (board.getBoard()[0].length) / 2;
-
-        System.out.println(halfLengthX);
 
         for(int i = 0; i < board.getBoard().length; i++){
             for(int j = 0; j < board.getBoard()[i].length; j++){
                 BoardPosition position = board.getBoard()[i][j];
+
+                //
                 int xDiff = halfLengthX - Math.abs(i  - halfLengthX) ;
                 int yDiff = halfLengthY - Math.abs(j  - halfLengthY) ;
-                int weight = (int)(board.getBoard().length * Math.log(1 + Math.min(xDiff, yDiff)));
 
-                newWeights[i][j] = new WeightedBoardNode(position, weight);
+                //2 different weight calculations.
+                //weight1 creates a "pyramid" structure of values increasing logarithmically towards the center
+                int weight1 = (int)(board.getBoard().length * Math.log(1 + Math.min(xDiff, yDiff)));
+                //weight2 creates a circular logarithmic increase towards the center, favouring the edges as well as the corners of the board
+                int weight2 = (int) (Math.min(halfLengthX, halfLengthY) * Math.log(1 + xDiff * yDiff));
+
+                newWeights[i][j] = new WeightedBoardNode(position, weight2);
             }
         }
 
@@ -57,7 +63,7 @@ public class SnakeAI {
      *
      * @param board Board that is being played on
      * @param snake The Snake that has to navigate on the board to the target.
-     * @param target Target Boardposition that the Snake
+     * @param target Target BoardPosition that the Snake must reach
      * @return The next direction the snake should move on the board in order to get to the target.
      */
     public Direction getNextMove(Board board, Snake snake, BoardPosition target){
