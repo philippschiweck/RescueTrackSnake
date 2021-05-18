@@ -2,22 +2,29 @@ package Snake.AI;
 
 import Snake.GameLogic.*;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+/**
+ *  AI that has the ability to calculate paths for the snake in the game Snake.
+ */
 public class SnakeAI {
-
-    //Todo Issue: When snake blocks entire length of board, head is on the other side of the food item
 
     private WeightedBoardNode[][] weights;
 
+    /**
+     *  Constructor for the SnakeAI object. Upon creation, the {@link SnakeAI#weights} array is filled with the corresponding Nodes according to the board size
+     *  with the function {@link SnakeAI#calculateBoardWeights(Board)}.
+     *
+     * @param board the {@link Board} the game is being played on.
+     */
     public SnakeAI(Board board){
         this.weights = calculateBoardWeights(board);
     }
 
     /**
+     *  Calculates the weights for each individual BoardPosition of the corresponding {@link Board}.
      *
-     * @param board
+     * @param board the {@link Board} the game is being played on.
      * @return
      */
     private WeightedBoardNode[][] calculateBoardWeights(Board board){
@@ -32,7 +39,7 @@ public class SnakeAI {
             for(int j = 0; j < board.getBoard()[i].length; j++){
                 BoardPosition position = board.getBoard()[i][j];
 
-                //
+                // Difference to middle of board in X / Y direction of Square board[i][j]
                 int xDiff = halfLengthX - Math.abs(i  - halfLengthX) ;
                 int yDiff = halfLengthY - Math.abs(j  - halfLengthY) ;
 
@@ -59,11 +66,11 @@ public class SnakeAI {
     }
 
     /**
-     * Calculates the next direction the snake has to move in order to get to the target.
+     * Calculates the next {@link Direction} the snake has to move in order to get to the target.
      *
-     * @param board Board that is being played on
-     * @param snake The Snake that has to navigate on the board to the target.
-     * @param target Target BoardPosition that the Snake must reach
+     * @param board {@link Board} that is being played on.
+     * @param snake The {@link Snake} that has to navigate on the board to the target.
+     * @param target Target {@link BoardPosition} that the Snake must reach.
      * @return The next direction the snake should move on the board in order to get to the target.
      */
     public Direction getNextMove(Board board, Snake snake, BoardPosition target){
@@ -106,8 +113,6 @@ public class SnakeAI {
      */
     private ArrayList<Node> calculatePath(Board board, Snake snake, BoardPosition target){
 
-        //Get weighted board positions
-
         //Current Elements in the queue
         ArrayList<Node> queue = new ArrayList<>();
         //Elements that have been seen
@@ -128,7 +133,7 @@ public class SnakeAI {
                 break;
             }
             for(Node node: getPossibleSurroundingNodes(board, current, target, snake.getBody())){
-                if(!isBoardPositionInList(node, seen)){
+                if(!seen.contains(node)){
                     seen.add(node);
                     queue.add(node);
                 }
@@ -143,16 +148,6 @@ public class SnakeAI {
             current = current.getParent();
         }
         return path;
-    }
-
-    private boolean isBoardPositionInList(Node node, ArrayList<Node> list){
-        boolean isInList = false;
-        for(Node element: list){
-            if(element.equals(node)){
-                isInList = true;
-            }
-        }
-        return isInList;
     }
 
     private Node getShortestDistanceNode(ArrayList<Node> list){
