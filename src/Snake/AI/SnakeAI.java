@@ -25,7 +25,7 @@ public class SnakeAI {
      *  Calculates the weights for each individual BoardPosition of the corresponding {@link Board}.
      *
      * @param board the {@link Board} the game is being played on.
-     * @return
+     * @return An Array of {@link WeightedBoardNode}s containing weights in accordance with the board size.
      */
     private WeightedBoardNode[][] calculateBoardWeights(Board board){
 
@@ -47,7 +47,7 @@ public class SnakeAI {
                 //weight1 creates a "pyramid" structure of values increasing logarithmically towards the center
                 int weight1 = (int)(board.getBoard().length * Math.log(1 + Math.min(xDiff, yDiff)));
                 //weight2 creates a circular logarithmic increase towards the center, favouring the edges as well as the corners of the board
-                int weight2 = (int) (Math.min(halfLengthX, halfLengthY) * Math.log(1 + xDiff * yDiff));
+                int weight2 = (int) (board.getBoard().length * Math.log(1 + xDiff * yDiff));
 
                 newWeights[i][j] = new WeightedBoardNode(position, weight2);
             }
@@ -55,9 +55,9 @@ public class SnakeAI {
 
         //Print out weights when SnakeAI is created, for reference
         System.out.println("Snake AI Board weights:");
-        for(int i = 0; i < newWeights.length; i++){
-            for(int j = 0; j < newWeights[i].length; j++){
-                System.out.print(newWeights[i][j].weight + " ");
+        for (WeightedBoardNode[] row : newWeights) {
+            for (WeightedBoardNode newWeight: row) {
+                System.out.print(newWeight.weight + " ");
             }
             System.out.println();
         }
@@ -150,6 +150,12 @@ public class SnakeAI {
         return path;
     }
 
+    /**
+     * Searches for the {@link Node} in the list with the shortest {@link Node#distance} property.
+     *
+     * @param list List of {@link Node}s.
+     * @return The {@link Node} with the shortest {@link Node#distance}.
+     */
     private Node getShortestDistanceNode(ArrayList<Node> list){
         Node leastDistance = list.get(0);
 
@@ -161,6 +167,12 @@ public class SnakeAI {
         return leastDistance;
     }
 
+    /**
+     * Searches for the {@link Node} in the list with the longest {@link Node#distance} property.
+     *
+     * @param list List of {@link Node}s.
+     * @return The {@link Node} with the longest {@link Node#distance}.
+     */
     private Node getLongestDistanceNode(ArrayList<Node> list){
         Node longestDistance = list.get(0);
 
@@ -173,12 +185,16 @@ public class SnakeAI {
     }
 
     /**
-     *
-     * @param board
-     * @param current
-     * @param target
-     * @param body
-     * @return
+     *  Find the Nodes surrounding the current {@link Node} that movement is possible to..
+     *  BoardPositions that are out of bounds are not included.
+     *  BoardPositions that are inside the snakes body are also not included, expect for if the snakes body occupying the Position has already moved on
+     *  at that point in the path.
+     *  Weights for the nodes are calculated, and an ArrayList of the Nodes is returned.
+     * @param board The {@link Board} the game of Snake is being played on.
+     * @param current The current {@link Node} of which the surrounding Nodes have to be calculated.
+     * @param target The target {@link BoardPosition} the snake has to move to. This is needed for distance calculations for the new {@link Node}s.
+     * @param body The body of the {@link Snake}.
+     * @return An ArrayList of the Nodes that can be moved to by the Snake.
      */
     private ArrayList<Node> getPossibleSurroundingNodes(Board board, Node current, BoardPosition target, ArrayList<SnakeSegment> body){
 
@@ -233,34 +249,49 @@ public class SnakeAI {
         return possibleNodes;
     }
 
+    /**
+     * Checks if a given {@link BoardPosition} is inside the {@link Board} that is being played on.
+     * @param board The {@link Board} the game is being played on.
+     * @param position The {@link BoardPosition} that needs to be checked.
+     * @return true if the position is on the board, false if it is outside of the board.
+     */
     private boolean isInBounds(Board board, BoardPosition position){
         return position.getPosY() >= 0 && position.getPosY() < board.getBoard()[0].length &&
                 position.getPosX() >= 0 && position.getPosX() < board.getBoard().length;
     }
 
     /**
-     * Manhatten Distance calculation.
-     *
-     * @param current
-     * @param target
-     * @return
+     * Calculates the Manhattan Distance from one BoardPosition to another.
+     * @param current The first {@link BoardPosition}.
+     * @param target The second {@link BoardPosition}.
+     * @return The Manhattan Distance between current and target Position.
      */
     private int calculateDistance(BoardPosition current, BoardPosition target){
         return Math.abs(current.getPosX() - target.getPosX()) + Math.abs(current.getPosY() - target.getPosY());
     }
 
+    /**
+     * A Node containing a BoardPosition, a weighted distance, a parent Node, as well as the distance to the root Node from where the pathfinding started.
+     * The root Node has null as its parent.
+     */
     private class Node{
         private BoardPosition position;
         private double distance;
         private Node parent;
         private int distanceToRoot;
 
+        /**
+         * Creates a node object. The distanceToRoot is set as 0 if this is the root Node. Otherwise, 1 is added to the parents distanceToRoot.
+         * @param position The {@link BoardPosition} of the Node.
+         * @param distance The weighted distance for the snake to move to this Node, according to the target.
+         * @param parent The parent Node of this node.
+         */
         public Node(BoardPosition position, double distance, Node parent){
             this.position = position;
             this.distance = distance;
             this.parent = parent;
             if(parent != null){
-                this.distanceToRoot += this.parent.getDistanceToRoot();
+                this.distanceToRoot = this.parent.getDistanceToRoot() + 1;
             } else { //This is the root if parent == null
                 this.distanceToRoot = 0;
             }
@@ -293,16 +324,17 @@ public class SnakeAI {
                 equals = false;
             } else {
                 Node node = (Node) obj;
-                if(node.getPosition().equals(this.position)){
-                    equals = true;
-                } else {
-                    equals = false;
-                }
+                //If a Node has the same BoardPosition as another Node, it is the same node.
+                equals = node.getPosition().equals(this.position);
             }
             return equals;
         }
     }
 
+    /**
+     *  Contains a BoardPosition and an associated weight.
+     *  Used to set weights for an entire Board of {@link BoardPosition}s.
+     */
     private class WeightedBoardNode{
 
         private BoardPosition position;

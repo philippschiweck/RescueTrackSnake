@@ -10,8 +10,8 @@ import java.util.function.BooleanSupplier;
 
 public class SnakeGame{
 
-    private final int SIZE_X = 7;
-    private final int SIZE_Y = 7;
+    private final int SIZE_X = 11;
+    private final int SIZE_Y = 11;
 
     public final char FOOD_SYMBOL = 'X';
 
@@ -82,8 +82,7 @@ public class SnakeGame{
 
         }
 
-        System.out.println(String.format("Game over! Score: %d", score));
-
+        System.out.printf("Game over! Score: %d%n", score);
     }
 
 
